@@ -1,0 +1,45 @@
+name: C++ CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 拉取代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 安装 C++ 工具链
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y cmake g++ clang-format
+
+      # 查看环境
+      - name: Check environment
+        run: |
+          cmake --version
+          g++ --version
+
+      # CMake 配置
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build
+
+      # 编译项目
+      - name: Build project
+        run: |
+          cmake --build build -j$(nproc)
+
+      # 可选：运行测试
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure
