@@ -12,33 +12,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 拉取代码
+      # Checkout source code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 安装 C++ 工具链
+      # Install dependencies
       - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y cmake g++ clang-format
 
-      # 查看环境
-      - name: Check environment
+      # Check clang-format version
+      - name: Check clang-format
         run: |
-          cmake --version
-          g++ --version
+          clang-format --version
 
-      # CMake 配置
+      # Check code formatting
+      - name: Verify clang-format
+        run: |
+          clang-format --dry-run --Werror $(find . -name "*.cpp" -o -name "*.h")
+
+      # Configure CMake
       - name: Configure CMake
         run: |
           cmake -S . -B build
 
-      # 编译项目
+      # Build project
       - name: Build project
         run: |
           cmake --build build -j$(nproc)
 
-      # 可选：运行测试
+      # Run tests
       - name: Run tests
         run: |
           cd build
